@@ -18,8 +18,8 @@ const int SAMPLE = 400;
 const double BRIGHTNESS = (2.0f * 3.1415926f) * (1.0f / double(SAMPLE));
 
 // 输出图像分辨率
-const int WIDTH = 1024;
-const int HEIGHT = 1024;
+const int WIDTH = 192;
+const int HEIGHT = 108;
 
 // 相机参数
 const double SCREEN_Z = 1.1;        // 视平面 z 坐标
