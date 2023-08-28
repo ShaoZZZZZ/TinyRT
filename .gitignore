@@ -1,7 +1,6 @@
 # CMake build output directories
 build/
 bin/
-lib/
 CMakeFiles/
 CMakeCache.txt
 CMakeScripts/
