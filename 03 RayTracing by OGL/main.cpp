@@ -72,7 +72,7 @@ struct Triangle_encoded {
 struct BVHNode_encoded {
     vec3 childs;        // (left, right, 保留)
     vec3 leafInfo;      // (n, index, 保留)
-    vec3 AA, BB;        
+    vec3 AA, BB;
 };
 
 // ----------------------------------------------------------------------------- //
@@ -109,7 +109,7 @@ public:
             }
             glDrawBuffers(attachments.size(), &attachments[0]);
         }
-        
+
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     void draw(std::vector<GLuint> texPassArray = {}) {
@@ -118,7 +118,7 @@ public:
         glBindVertexArray(vao);
         // 传上一帧的帧缓冲颜色附件
         for (int i = 0; i < texPassArray.size(); i++) {
-            glActiveTexture(GL_TEXTURE0+i);
+            glActiveTexture(GL_TEXTURE0 + i);
             glBindTexture(GL_TEXTURE_2D, texPassArray[i]);
             std::string uName = "texPass" + std::to_string(i);
             glUniform1i(glGetUniformLocation(program, uName.c_str()), i);
@@ -458,7 +458,7 @@ int buildBVHwithSAH(std::vector<Triangle>& triangles, std::vector<BVHNode>& node
     if (l > r) return 0;
 
     nodes.push_back(BVHNode());
-    int id = nodes.size() - 1;   
+    int id = nodes.size() - 1;
     nodes[id].left = nodes[id].right = nodes[id].n = nodes[id].index = 0;
     nodes[id].AA = vec3(1145141919, 1145141919, 1145141919);
     nodes[id].BB = vec3(-1145141919, -1145141919, -1145141919);
@@ -578,7 +578,7 @@ int buildBVHwithSAH(std::vector<Triangle>& triangles, std::vector<BVHNode>& node
     if (Axis == 2) std::sort(&triangles[0] + l, &triangles[0] + r + 1, cmpz);
 
     // 递归
-    int left  = buildBVHwithSAH(triangles, nodes, l, Split, n);
+    int left = buildBVHwithSAH(triangles, nodes, l, Split, n);
     int right = buildBVHwithSAH(triangles, nodes, Split + 1, r, n);
 
     nodes[id].left = left;
@@ -594,7 +594,7 @@ clock_t t1, t2;
 double dt, fps;
 unsigned int frameCounter = 0;
 void display() {
-    
+
     // 帧计时
     t2 = clock();
     dt = (double)(t2 - t1) / CLOCKS_PER_SEC;
@@ -677,7 +677,7 @@ int main(int argc, char** argv) {
 
     glutInit(&argc, argv);              // glut初始化
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
-    glutInitWindowSize(512, 512);// 窗口大小
+    glutInitWindowSize(1024, 1024);// 窗口大小
     glutInitWindowPosition(350, 50);
     glutCreateWindow("Path Tracing GPU"); // 创建OpenGL上下文
     glewInit();
@@ -688,17 +688,19 @@ int main(int argc, char** argv) {
     std::vector<Triangle> triangles;
 
     Material m;
-    m.baseColor = vec3(1, 1, 1);
-    readObj("models/Stanford Bunny.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.3, -1.6, 0), vec3(1.5, 1.5, 1.5)),true);
+    m.baseColor = vec3(1, 0.5, 0.3);
+
+    readObj("models/Stanford Bunny.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.3, -1.6, 0), vec3(1.5, 1.5, 1.5)), true);
     //readObj("models/room.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.0, -2.5, 0), vec3(10, 10, 10)), true);
 
     m.baseColor = vec3(0.725, 0.71, 0.68);
-    readObj("models/quad.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0, -1.4, 0), vec3(18.83, 0.01, 18.83)), false);
+    m.emissive = vec3(0.2, 0, 0.2);
+    readObj("models/quad.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0, -1.4, 0), vec3(18.83, 0.01, 10.83)), false);
 
     m.baseColor = vec3(1, 1, 1);
-    m.emissive = vec3(30, 20, 10);
+    m.emissive = vec3(20, 20, 10);
     //readObj("models/quad.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.0, 1.38, -0.0), vec3(0.7, 0.01, 0.7)), false);
-    readObj("models/sphere.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.0, 0.9, -0.0), vec3(1,1, 1)), false);
+    readObj("models/sphere.obj", triangles, m, getTransformMatrix(vec3(0, 0, 0), vec3(0.0, 0.9, -0.0), vec3(1, 1, 1)), false);
 
     int nTriangles = triangles.size();
     std::cout << "模型读取完成: 共 " << nTriangles << " 个三角形" << std::endl;
@@ -771,7 +773,7 @@ int main(int argc, char** argv) {
 
     // hdr 全景图
     HDRLoaderResult hdrRes;
-    bool r = HDRLoader::load("./HDR/sunset.hdr", hdrRes);
+    bool r = HDRLoader::load("./HDR/circus_arena_4k.hdr", hdrRes);
     hdrMap = getTextureRGB32F(hdrRes.width, hdrRes.height);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, hdrRes.width, hdrRes.height, 0, GL_RGB, GL_FLOAT, hdrRes.cols);
 
@@ -785,7 +787,7 @@ int main(int argc, char** argv) {
     pass1.colorAttachments.push_back(getTextureRGB32F(pass1.width, pass1.height));
     pass1.colorAttachments.push_back(getTextureRGB32F(pass1.width, pass1.height));
     pass1.bindData();
-   
+
     glUseProgram(pass1.program);
     glUniform1i(glGetUniformLocation(pass1.program, "nTriangles"), triangles.size());
     glUniform1i(glGetUniformLocation(pass1.program, "nNodes"), nodes.size());
@@ -807,7 +809,7 @@ int main(int argc, char** argv) {
     std::cout << "开始..." << std::endl << std::endl;
 
     glEnable(GL_DEPTH_TEST);  // 开启深度测试
-    glClearColor(0.0, 0.0, 0, 1.0);   // 背景颜色 -- 黑
+    glClearColor(0.0, 0.0, 0.0, 0.0);   // 背景颜色 -- 黑
 
     glutDisplayFunc(display);   // 设置显示回调函数
     glutIdleFunc(frameFunc);    // 闲置时刷新
